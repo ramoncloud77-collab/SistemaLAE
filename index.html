@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema LAE — Agenda Lotada no Exterior</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#FFCC00;--g2:rgba(255,204,0,0.12);--g3:rgba(255,204,0,0.06);
+  --g4:rgba(255,204,0,0.25);
+  --k:#0a0a0a;--s:#111;--s2:#151515;--s3:#1a1a1a;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --t:#fff;--t2:rgba(255,255,255,0.58);--t3:rgba(255,255,255,0.22);--t4:rgba(255,255,255,0.07);
+  --r:14px;--r2:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--k);color:var(--t);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,204,0,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,204,0,0.016) 1px,transparent 1px);background-size:64px 64px;pointer-events:none;z-index:0}
+.z{position:relative;z-index:1}
+.w{max-width:720px;margin:0 auto;padding:0 24px}
+.ww{max-width:1000px;margin:0 auto;padding:0 24px}
+section{padding:96px 0;position:relative;z-index:1}
+.sep{height:1px;background:var(--b);position:relative;z-index:1}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g);display:block;margin-bottom:14px}
+.sh{font-family:'Syne',sans-serif;font-size:clamp(30px,4.8vw,48px);font-weight:800;letter-spacing:-1.5px;line-height:1.07;color:var(--t)}
+.sh em{font-style:normal;color:var(--g)}
+.sp{font-size:15px;color:var(--t2);line-height:1.78}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(10,10,10,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);height:56px;display:flex;align-items:center;padding:0 28px;justify-content:space-between}
+.nl{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--g);letter-spacing:-0.3px}
+.nb{background:var(--g);color:#000;font-size:12px;font-weight:700;padding:8px 20px;border-radius:100px;text-decoration:none;transition:opacity .15s}
+.nb:hover{opacity:.85}
+
+/* BTN */
+.btn{display:inline-block;background:var(--g);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;padding:17px 44px;border-radius:12px;border:none;cursor:pointer;text-decoration:none;letter-spacing:.2px;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,204,0,0.25)}
+.btn:active{transform:translateY(0)}
+.btn-full{display:block;width:100%;max-width:420px;text-align:center;font-size:16px;padding:19px 40px;margin:0 auto}
+.btn-lg{font-size:17px;padding:20px 52px}
+
+/* HERO */
+.hero{padding:96px 0 80px;text-align:center}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(255,204,0,0.065) 0%,transparent 65%);pointer-events:none}
+.h-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,204,0,0.2);background:rgba(255,204,0,0.05);border-radius:100px;padding:6px 16px 6px 8px;font-size:11px;font-weight:600;color:var(--g);margin-bottom:32px;letter-spacing:.3px}
+.h-badge .dot{width:18px;height:18px;background:rgba(255,204,0,0.14);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(36px,6.5vw,66px);font-weight:800;letter-spacing:-2.5px;line-height:1.01;margin-bottom:24px}
+.hero h1 em{font-style:normal;color:var(--g)}
+.h-sub{font-size:17px;color:var(--t2);max-width:530px;margin:0 auto 40px;line-height:1.72}
+.h-checks{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px;margin-bottom:48px}
+.h-ck{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t2);font-weight:500}
+.h-ck .ic{color:var(--g);font-weight:700;font-size:11px}
+.price-old{font-size:13px;color:var(--t3);text-decoration:line-through;margin-bottom:4px}
+.price-big{font-family:'Syne',sans-serif;font-size:80px;font-weight:800;color:var(--g);letter-spacing:-4px;line-height:1}
+.price-big sup{font-size:32px;letter-spacing:0;vertical-align:super}
+.price-note{font-size:12px;color:var(--t3);margin-top:6px;margin-bottom:28px}
+.h-secure{margin-top:14px;font-size:11px;color:var(--t3)}
+.h-secure span{margin:0 8px}
+
+/* STRIP */
+.strip{border-top:1px solid var(--b);border-bottom:1px solid var(--b);background:var(--s)}
+.strip-in{display:grid;grid-template-columns:repeat(4,1fr)}
+.sc{padding:28px 16px;text-align:center;position:relative}
+.sc+.sc::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:var(--b)}
+.sn{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--g);letter-spacing:-1px;line-height:1}
+.sl{font-size:10px;color:var(--t3);margin-top:4px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+
+/* IDENTIFY */
+.id-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
+.id-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:24px 20px;transition:border-color .2s}
+.id-card:hover{border-color:rgba(255,204,0,0.2)}
+.id-num{font-size:11px;font-weight:700;color:var(--g);opacity:.5;margin-bottom:10px;letter-spacing:1px}
+.id-card h4{font-size:14px;font-weight:500;color:var(--t);line-height:1.5}
+.id-foot{margin-top:36px;text-align:center;padding:20px 28px;background:var(--g3);border:1px solid rgba(255,204,0,0.12);border-radius:var(--r2)}
+.id-foot p{font-size:14px;color:var(--t2);font-style:italic}
+.id-foot strong{color:var(--g);font-style:normal}
+
+/* BIG IDEA / LAE */
+.lae-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px}
+.lae-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+.lae-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g);opacity:.5}
+.lae-letter{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:var(--g);opacity:.15;line-height:1;margin-bottom:16px}
+.lae-title{font-size:17px;font-weight:700;color:var(--t);margin-bottom:10px}
+.lae-text{font-size:13px;color:var(--t2);line-height:1.65}
+
+/* ERROR / BURACOS */
+.buraco-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
+.buraco-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:28px 24px;border-left:3px solid rgba(255,80,80,0.4)}
+.buraco-num{font-size:10px;font-weight:700;color:rgba(255,100,100,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.buraco-title{font-size:16px;font-weight:700;color:var(--t);margin-bottom:8px}
+.buraco-text{font-size:13px;color:var(--t2);line-height:1.65}
+
+/* AUTHOR */
+.author-wrap{display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start;margin-top:48px}
+.author-photo{width:200px;height:200px;border-radius:16px;background:var(--s);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.author-photo img{width:100%;height:100%;object-fit:cover}
+.author-photo-placeholder{width:200px;height:200px;border-radius:16px;background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid rgba(255,204,0,0.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:48px}
+.author-name{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--t);margin-bottom:4px}
+.author-role{font-size:13px;color:var(--g);font-weight:600;margin-bottom:20px;letter-spacing:.3px}
+.author-text{font-size:15px;color:var(--t2);line-height:1.78;margin-bottom:14px}
+.author-stats{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+.astat{text-align:center}
+.astat-n{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--g)}
+.astat-l{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* COMPARE TABLE */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--b);border-radius:var(--r);overflow:hidden;margin-top:48px}
+.cmp-header{padding:18px 24px;font-size:13px;font-weight:700;letter-spacing:.5px;text-align:center}
+.cmp-header.bad{background:rgba(255,60,60,0.06);color:rgba(255,100,100,0.8)}
+.cmp-header.good{background:rgba(255,204,0,0.06);color:var(--g)}
+.cmp-row{display:contents}
+.cmp-cell{padding:14px 20px;font-size:13px;border-top:1px solid var(--b);display:flex;align-items:center;gap:10px}
+.cmp-cell.bad{background:rgba(255,60,60,0.03);color:var(--t2)}
+.cmp-cell.good{background:rgba(255,204,0,0.025);color:var(--t2)}
+.cmp-ic{font-size:12px;flex-shrink:0}
+
+/* TESTIMONIALS */
+.test-grid{display:grid;gap:20px;margin-top:48px}
+.test-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.test-left{}
+.test-avatar{width:52px;height:52px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--g);margin-bottom:12px;border:1px solid rgba(255,204,0,0.15)}
+.test-name{font-size:15px;font-weight:700;color:var(--t);margin-bottom:2px}
+.test-role{font-size:12px;color:var(--t3);margin-bottom:4px}
+.test-verified{font-size:10px;color:var(--g);font-weight:600;letter-spacing:.5px}
+.test-quote{font-size:14px;color:var(--t2);line-height:1.7;font-style:italic;margin:16px 0;padding-left:14px;border-left:2px solid rgba(255,204,0,0.3)}
+.test-metrics{display:flex;gap:12px;flex-wrap:wrap}
+.test-metric{background:var(--g3);border:1px solid rgba(255,204,0,0.12);border-radius:8px;padding:8px 12px;text-align:center}
+.test-metric-n{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--g)}
+.test-metric-l{font-size:10px;color:var(--t3);margin-top:2px}
+.test-right{}
+.test-print{border-radius:10px;overflow:hidden;background:var(--s2);border:1px solid var(--b)}
+.test-print-header{background:#075e54;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.test-print-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3)}
+.test-print-title{font-size:11px;color:rgba(255,255,255,0.8);font-weight:600}
+.test-print-body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:85%;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5}
+.msg.in{background:#1f2c34;color:rgba(255,255,255,0.85);align-self:flex-start;border-radius:2px 8px 8px 8px}
+.msg.out{background:#005c4b;color:rgba(255,255,255,0.9);align-self:flex-end;border-radius:8px 2px 8px 8px}
+.msg-time{font-size:9px;opacity:.5;margin-top:3px;text-align:right}
+
+/* PHOTO TESTS */
+.photo-test{border-radius:10px;overflow:hidden;border:1px solid var(--b)}
+.photo-test img{width:100%;display:block}
+
+/* MODULES */
+.mod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:48px}
+.mod-item{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:20px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s}
+.mod-item:hover{border-color:rgba(255,204,0,0.15)}
+.mod-n{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--g);opacity:.5;flex-shrink:0;margin-top:1px}
+.mod-content h4{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.mod-content p{font-size:12px;color:var(--t3);line-height:1.5}
+
+/* BONUS */
+.bn-grid{display:grid;gap:14px;margin-top:48px}
+.bn-cell{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:22px 24px;display:flex;align-items:flex-start;gap:20px;transition:border-color .2s}
+.bn-cell:hover{border-color:rgba(255,204,0,0.18)}
+.bn-i{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--g);background:var(--g3);border:1px solid rgba(255,204,0,0.15);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bn-h{font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px}
+.bn-p{font-size:13px;color:var(--t2);line-height:1.55}
+.bn-val{font-size:11px;color:var(--t3);margin-top:6px}
+.bn-val strong{color:var(--g)}
+.stack-total{margin-top:28px;padding:20px 28px;background:var(--g3);border:1px solid rgba(255,204,0,0.18);border-radius:var(--r2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.stack-left{font-size:14px;color:var(--t2)}
+.stack-left strong{color:var(--t);display:block;font-size:16px;margin-bottom:2px}
+.stack-right{text-align:right}
+.stack-right .old{font-size:13px;color:var(--t3);text-decoration:line-through}
+.stack-right .new{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--g);letter-spacing:-1px}
+
+/* ROI */
+.roi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:40px}
+.roi-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:20px;text-align:center}
+.roi-n{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--g);margin-bottom:4px}
+.roi-l{font-size:11px;color:var(--t3)}
+
+/* GUARANTEE */
+.gtee{background:var(--s);border:1px solid rgba(255,204,0,0.18);border-radius:var(--r);padding:48px;text-align:center;position:relative;overflow:hidden;margin-top:48px}
+.gtee::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent)}
+.gtee-badge{font-size:52px;margin-bottom:20px;display:block}
+.gtee-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--t);margin-bottom:16px;letter-spacing:-1px}
+.gtee-text{font-size:15px;color:var(--t2);line-height:1.78;max-width:520px;margin:0 auto}
+.gtee-days{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;color:var(--g);line-height:1;margin:24px 0 8px;letter-spacing:-3px}
+.gtee-sub{font-size:13px;color:var(--t3);letter-spacing:2px;text-transform:uppercase}
+
+/* FAQ */
+.faq-list{margin-top:48px;display:flex;flex-direction:column;gap:2px}
+.faq-item{border:1px solid var(--b);border-radius:var(--r2);overflow:hidden}
+.faq-q{padding:18px 22px;font-size:14px;font-weight:600;color:var(--t);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--s);transition:background .2s}
+.faq-q:hover{background:var(--s2)}
+.faq-ic{color:var(--g);font-size:18px;flex-shrink:0;transition:transform .2s;line-height:1}
+.faq-a{font-size:14px;color:var(--t2);line-height:1.72;padding:0 22px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.faq-item.open .faq-a{max-height:300px;padding:0 22px 18px}
+.faq-item.open .faq-ic{transform:rotate(45deg)}
+
+/* CTA FINAL */
+.cta-final{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:64px 48px;text-align:center;position:relative;overflow:hidden}
+.cta-final::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(255,204,0,0.06) 0%,transparent 65%);pointer-events:none}
+.cta-final h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
+.cta-final h2 em{font-style:normal;color:var(--g)}
+.cta-final p{font-size:15px;color:var(--t2);max-width:480px;margin:0 auto 36px;line-height:1.72}
+
+/* FOOTER */
+footer{border-top:1px solid var(--b);padding:32px 24px;text-align:center}
+footer p{font-size:11px;color:var(--t3);line-height:1.7}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .id-grid{grid-template-columns:1fr 1fr}
+  .lae-grid{grid-template-columns:1fr}
+  .buraco-grid{grid-template-columns:1fr}
+  .test-card{grid-template-columns:1fr}
+  .mod-grid{grid-template-columns:1fr}
+  .roi-grid{grid-template-columns:repeat(2,1fr)}
+  .author-wrap{grid-template-columns:1fr}
+  .author-photo-placeholder{width:100%;height:160px}
+  .cmp{grid-template-columns:1fr 1fr}
+  .strip-in{grid-template-columns:repeat(2,1fr)}
+  .cta-final{padding:40px 24px}
+  .gtee{padding:36px 24px}
+}
+@media(max-width:400px){
+  .id-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="z">
+  <div class="nl">Sistema <span>LAE</span></div>
+  <a href="#cta" class="nb">Garantir minha vaga — €37</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero z">
+  <div class="w" style="text-align:center">
+    <div class="h-badge"><span class="dot">🇧🇷</span> SISTEMA LAE · DESENVOLVIDO PARA BRASILEIROS NO EXTERIOR</div>
+    <h1>Como brasileiros no exterior estão <em>lotando a agenda em 14 dias</em> — sem depender de indicação, sem seguidores e sem gastar fortuna em anúncio</h1>
+    <p class="h-sub">O Sistema LAE é o método de aquisição de clientes desenvolvido especificamente para autônomos brasileiros na Irlanda, Portugal, Inglaterra, EUA e Canadá — em qualquer nicho de serviço.</p>
+
+    <div class="h-checks">
+      <span class="h-ck"><span class="ic">✓</span> Sistema completo de aquisição</span>
+      <span class="h-ck"><span class="ic">✓</span> Scripts prontos de WhatsApp</span>
+      <span class="h-ck"><span class="ic">✓</span> 5 bônus exclusivos</span>
+      <span class="h-ck"><span class="ic">✓</span> Garantia de 7 dias</span>
+      <span class="h-ck"><span class="ic">✓</span> Aplicação imediata</span>
+    </div>
+
+    <div class="price-old">De €297</div>
+    <div class="price-big"><sup>€</sup>37</div>
+    <div class="price-note">Pagamento único · PDF entregue imediatamente · Em português</div>
+
+    <a href="#cta" class="btn btn-lg">Quero minha agenda cheia — €37</a>
+    <div class="h-secure">🔒 Compra segura <span>·</span> Entrega imediata por e-mail <span>·</span> Garantia de 7 dias</div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- STRIP -->
+<div class="strip z">
+  <div class="strip-in ww">
+    <div class="sc"><div class="sn">340+</div><div class="sl">Brasileiros aplicando</div></div>
+    <div class="sc"><div class="sn">5</div><div class="sl">Países atendidos</div></div>
+    <div class="sc"><div class="sn">14d</div><div class="sl">Primeiros resultados</div></div>
+    <div class="sc"><div class="sn">€37</div><div class="sl">Pagamento único</div></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- IDENTIFICAÇÃO -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">Antes de continuar</span>
+    <h2 class="sh">Isso é para você?</h2>
+    <p class="sp" style="margin-top:14px">Você mora no exterior e presta serviço — limpeza, pintura, estética, construção, jardinagem, barbearia ou qualquer outro. E mesmo sendo bom no que faz, se identifica com alguma dessas situações:</p>
+
+    <div class="id-grid">
+      <div class="id-card"><div class="id-num">01</div><h4>O WhatsApp fica dias sem tocar e você não sabe como mudar isso</h4></div>
+      <div class="id-card"><div class="id-num">02</div><h4>Depende de indicação e reza para aparecer cliente todo mês</h4></div>
+      <div class="id-card"><div class="id-num">03</div><h4>Vê outro brasileiro com agenda cheia e não entende o que ele faz diferente</h4></div>
+      <div class="id-card"><div class="id-num">04</div><h4>Já postou no Instagram, já impulsionou — e não veio nada concreto</h4></div>
+      <div class="id-card"><div class="id-num">05</div><h4>Cobra barato com medo de perder o cliente que aparece</h4></div>
+      <div class="id-card"><div class="id-num">06</div><h4>Sabe executar o serviço melhor do que ninguém — mas não sabe vender todos os dias</h4></div>
+    </div>
+
+    <div class="id-foot">
+      <p>Se você se identificou com <strong>2 ou mais situações</strong>, o que você vai ler agora foi escrito exatamente para você.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- BIG IDEA — SISTEMA LAE -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">A solução</span>
+    <h2 class="sh">O problema não é o seu serviço.<br><em>É o sistema.</em></h2>
+    <p class="sp" style="margin-top:14px;max-width:580px">Brasileiros que lotam a agenda no exterior não trabalham mais do que você. Não são mais simpáticos. Não cobram mais barato. Eles usam um sistema de 3 movimentos que a maioria nunca aprendeu — porque ninguém ensinou antes de você vir para cá.</p>
+
+    <div class="lae-grid">
+      <div class="lae-card">
+        <div class="lae-letter">L</div>
+        <div class="lae-title">Localização</div>
+        <div class="lae-text">Saber exatamente onde o cliente certo está no seu raio de 10km e aparecer na frente dele antes da concorrência — sem depender do algoritmo do Instagram</div>
+      </div>
+      <div class="lae-card">
+        <div class="lae-letter">A</div>
+        <div class="lae-title">Abordagem</div>
+        <div class="lae-text">Usar os scripts desenvolvidos para o contexto do exterior — onde o cliente é mais desconfiado, compara mais preço e decide mais devagar do que no Brasil</div>
+      </div>
+      <div class="lae-card">
+        <div class="lae-letter">E</div>
+        <div class="lae-title">Escala</div>
+        <div class="lae-text">Transformar cada cliente fechado em 2 ou 3 indicações qualificadas — de forma sistemática, não por sorte. Sua agenda cresce sozinha.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--b);border-radius:var(--r);overflow:hidden">
+        <div class="cmp-header bad">Sem o Sistema LAE</div>
+        <div class="cmp-header good">Com o Sistema LAE</div>
+        <div class="cmp-cell bad"><span class="cmp-ic">✕</span> Posta sem estratégia e sem resultado</div>
+        <div class="cmp-cell good"><span class="cmp-ic" style="color:var(--g)">→</span> Posicionamento que atrai o cliente certo</div>
+        <div class="cmp-cell bad"><span class="cmp-ic">✕</span> Espera indicação como única fonte</div>
+        <div class="cmp-cell good"><span class="cmp-ic" style="color:var(--g)">→</span> Captação diária com método comprovado</div>
+        <div class="cmp-cell bad"><span class="cmp-ic">✕</span> Responde no WhatsApp sem roteiro</div>
+        <div class="cmp-cell good"><span class="cmp-ic" style="color:var(--g)">→</span> Scripts prontos para cada etapa da venda</div>
+        <div class="cmp-cell bad"><span class="cmp-ic">✕</span> Briga por preço contra a concorrência</div>
+        <div class="cmp-cell good"><span class="cmp-ic" style="color:var(--g)">→</span> Autoridade que justifica preço maior</div>
+        <div class="cmp-cell bad"><span class="cmp-ic">✕</span> Agenda vazia e renda imprevisível</div>
+        <div class="cmp-cell good"><span class="cmp-ic" style="color:var(--g)">→</span> Agenda previsível e renda consistente</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ERRO FATAL -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">O que ninguém te contou</span>
+    <h2 class="sh">Por que a maioria dos brasileiros fracassa no exterior — <em>mesmo sendo excelente</em> no que faz</h2>
+
+    <p class="sp" style="margin-top:20px;font-style:italic;padding-left:18px;border-left:2px solid rgba(255,204,0,0.3)">Quando cheguei no exterior, fiz o que todo mundo faz. Criei um Instagram. Comecei a postar. Pedi indicação até me sentir desconfortável. Cobrei barato porque achei que era a única forma de conseguir cliente. No primeiro mês, 2 clientes. No segundo, os mesmos 2. No terceiro, um sumiu. E aí entendi o problema. Não era o meu serviço — eu entregava bem. Não era o mercado. Era que eu não tinha sistema. Tinha esperança.</p>
+
+    <div class="buraco-grid">
+      <div class="buraco-card">
+        <div class="buraco-num">Buraco 01</div>
+        <div class="buraco-title">Dependência de indicação</div>
+        <div class="buraco-text">Indicação é ótima quando chega. O problema é que você não controla quando chega. Num mês sobra cliente, no outro falta. Você não tem negócio — tem sorte.</div>
+      </div>
+      <div class="buraco-card">
+        <div class="buraco-num">Buraco 02</div>
+        <div class="buraco-title">Marketing de volume sem estratégia</div>
+        <div class="buraco-text">Postar todo dia parece produtivo. Mas no exterior, o algoritmo não entrega seu post para quem mora no seu bairro. Você faz conteúdo para seguidores do Brasil que nunca vão te contratar.</div>
+      </div>
+      <div class="buraco-card">
+        <div class="buraco-num">Buraco 03</div>
+        <div class="buraco-title">Abordagem errada no WhatsApp</div>
+        <div class="buraco-text">O cliente no exterior é mais desconfiado que no Brasil. Ele compara mais, pesquisa mais, decide mais devagar. Mandar mensagem sem o roteiro certo faz você parecer desesperado — e o cliente some.</div>
+      </div>
+      <div class="buraco-card">
+        <div class="buraco-num">Buraco 04</div>
+        <div class="buraco-title">Falta de posicionamento</div>
+        <div class="buraco-text">Sem posicionamento, você compete por preço. E sempre vai ter alguém cobrando mais barato. Quem lota a agenda não compete por preço — se posiciona de um jeito que o preço deixa de ser o critério.</div>
+      </div>
+    </div>
+
+    <p class="sp" style="margin-top:28px;text-align:center">Esses 4 buracos não têm nada a ver com habilidade, esforço ou talento.<br><strong style="color:var(--t)">Têm a ver com sistema. E sistema se aprende.</strong></p>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- AUTOR -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">Quem sou eu</span>
+    <h2 class="sh">Por que você deveria ouvir o que tenho a dizer</h2>
+
+    <div class="author-wrap">
+      <div>
+        <div class="author-photo-placeholder">
+          <span>📸</span>
+          <span style="font-size:12px;color:var(--t3);text-align:center;padding:0 16px">Adicione sua foto aqui</span>
+        </div>
+      </div>
+      <div>
+        <div class="author-name">[Seu Nome]</div>
+        <div class="author-role">Criador do Sistema LAE · [Cidade], [País]</div>
+        <p class="author-text">Morei [X] anos na [país]. Cheguei sem conhecer ninguém, sem entender bem o mercado local e com o mesmo problema que você tem agora — sabia executar meu serviço, mas não sabia como chegar nos clientes certos.</p>
+        <p class="author-text">Nos primeiros meses, fiz tudo errado. Postei no Instagram sem resultado. Pedi indicação até me sentir desconfortável. Cobrei barato por medo. Até que parei de tentar adivinhar e comecei a estudar o que realmente funciona no contexto do exterior.</p>
+        <p class="author-text">O que descobri mudou tudo. Em [X] meses minha agenda estava cheia. Aumentei meu preço em [X]% sem perder cliente. E desde então ajudei mais de 340 brasileiros em 5 países a construir negócios previsíveis usando o mesmo sistema.</p>
+        <p class="author-text">Não sou guru. Sou um brasileiro que descobriu o que funciona — e coloquei tudo isso em €37 para que você não precise aprender do jeito difícil como eu aprendi.</p>
+        <div class="author-stats">
+          <div class="astat"><div class="astat-n">340+</div><div class="astat-l">Alunos</div></div>
+          <div class="astat"><div class="astat-n">5</div><div class="astat-l">Países</div></div>
+          <div class="astat"><div class="astat-n">[X] anos</div><div class="astat-l">No exterior</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- PROVAS REAIS -->
+<section class="z">
+  <div class="w" style="max-width:860px">
+    <span class="eyebrow">Resultados reais</span>
+    <h2 class="sh">Eles aplicaram.<br><em>Isso aconteceu.</em></h2>
+    <p class="sp" style="margin-top:14px">Conversas reais. Resultados reais. Sem edição, sem roteiro.</p>
+
+    <div class="test-grid">
+
+      <!-- TEST 1 -->
+      <div class="test-card">
+        <div class="test-left">
+          <div class="test-avatar">RS</div>
+          <div class="test-name">Rafael S.</div>
+          <div class="test-role">Limpeza residencial · Dublin, Irlanda</div>
+          <div class="test-verified">✓ VERIFICADO</div>
+          <p class="test-quote">"Recebi 37 mensagens no WhatsApp e fechei 6 serviços em 10 dias. É a primeira vez que meu WhatsApp fica assim, sem parar. Nunca tinha acontecido isso antes de aplicar o método."</p>
+          <div class="test-metrics">
+            <div class="test-metric"><div class="test-metric-n">37</div><div class="test-metric-l">Mensagens recebidas</div></div>
+            <div class="test-metric"><div class="test-metric-n">6</div><div class="test-metric-l">Serviços fechados</div></div>
+            <div class="test-metric"><div class="test-metric-n">10d</div><div class="test-metric-l">Tempo total</div></div>
+          </div>
+        </div>
+        <div class="test-right">
+          <div class="test-print">
+            <div class="test-print-header">
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-title">WhatsApp — Rafael</div>
+            </div>
+            <div class="test-print-body">
+              <div class="msg in">Olá! Vi seu perfil no Instagram. Você faz limpeza em Swords?<div class="msg-time">09:14 ✓✓</div></div>
+              <div class="msg out">Olá! Sim, atendo Swords e região. Quando precisaria?<div class="msg-time">09:16 ✓✓</div></div>
+              <div class="msg in">Precisaria para essa semana, quinta ou sexta. Apartamento de 2 quartos.<div class="msg-time">09:18 ✓✓</div></div>
+              <div class="msg out">Quinta tenho horário disponível. Posso passar orçamento agora?<div class="msg-time">09:19 ✓✓</div></div>
+              <div class="msg in">Pode sim! 🙏<div class="msg-time">09:20 ✓✓</div></div>
+              <div class="msg out">Apartamento 2 quartos limpeza completa: €85. Inclui cozinha, banheiros e varrição geral. Confirma quinta às 10h?<div class="msg-time">09:21 ✓✓</div></div>
+              <div class="msg in">Perfeito! Confirmado. Obrigada! ✅<div class="msg-time">09:23 ✓✓</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEST 2 -->
+      <div class="test-card">
+        <div class="test-left">
+          <div class="test-avatar">AS</div>
+          <div class="test-name">Andre S.</div>
+          <div class="test-role">Pintura · Lisboa, Portugal</div>
+          <div class="test-verified">✓ VERIFICADO</div>
+          <p class="test-quote">"Em 12 dias já fechei 4 serviços de pintura. Já estava quase desistindo de anunciar — segui o passo a passo e mudou o jogo. Ainda tenho 3 orçamentos em aberto que estão quase fechando."</p>
+          <div class="test-metrics">
+            <div class="test-metric"><div class="test-metric-n">4</div><div class="test-metric-l">Serviços fechados</div></div>
+            <div class="test-metric"><div class="test-metric-n">12d</div><div class="test-metric-l">Tempo total</div></div>
+            <div class="test-metric"><div class="test-metric-n">+3</div><div class="test-metric-l">Orçamentos abertos</div></div>
+          </div>
+        </div>
+        <div class="test-right">
+          <div class="test-print">
+            <div class="test-print-header">
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-title">WhatsApp — Andre</div>
+            </div>
+            <div class="test-print-body">
+              <div class="msg in">Boa tarde! Você pinta apartamentos em Lisboa?<div class="msg-time">14:32 ✓✓</div></div>
+              <div class="msg out">Boa tarde! Sim, faço pintura residencial e comercial em toda a Grande Lisboa. Que tipo de trabalho precisaria?<div class="msg-time">14:34 ✓✓</div></div>
+              <div class="msg in">Sala e dois quartos. Precisa de acabamento fino, paredes com algumas manchas.<div class="msg-time">14:36 ✓✓</div></div>
+              <div class="msg out">Entendido. Pelo que descreve, trabalho de 2 dias. Posso fazer uma visita rápida amanhã para orçamento sem compromisso?<div class="msg-time">14:37 ✓✓</div></div>
+              <div class="msg in">Pode ser amanhã às 18h?<div class="msg-time">14:39 ✓✓</div></div>
+              <div class="msg out">Confirmado às 18h. Mando localização antes. 👍<div class="msg-time">14:40 ✓✓</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEST 3 -->
+      <div class="test-card">
+        <div class="test-left">
+          <div class="test-avatar">JM</div>
+          <div class="test-name">Juliana M.</div>
+          <div class="test-role">Estética · Toronto, Canadá</div>
+          <div class="test-verified">✓ VERIFICADO</div>
+          <p class="test-quote">"Vivia cheia de horários vagos. Hoje estou com 2 semanas de antecedência na agenda 100% preenchida. Com clientes que chegam prontos pra fechar, sem precisar convencer ninguém."</p>
+          <div class="test-metrics">
+            <div class="test-metric"><div class="test-metric-n">100%</div><div class="test-metric-l">Agenda preenchida</div></div>
+            <div class="test-metric"><div class="test-metric-n">2 sem</div><div class="test-metric-l">De antecedência</div></div>
+            <div class="test-metric"><div class="test-metric-n">14d</div><div class="test-metric-l">Para lotar</div></div>
+          </div>
+        </div>
+        <div class="test-right">
+          <div class="test-print">
+            <div class="test-print-header">
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-dot"></div>
+              <div class="test-print-title">WhatsApp — Juliana</div>
+            </div>
+            <div class="test-print-body">
+              <div class="msg in">Oi Ju! Vi seu perfil aqui em Toronto. Faz sobrancelha e depilação?<div class="msg-time">11:05 ✓✓</div></div>
+              <div class="msg out">Oi! Faço sim — sobrancelha, design, henna e depilação completa. Qual serviço você precisa?<div class="msg-time">11:07 ✓✓</div></div>
+              <div class="msg in">Design de sobrancelha! Quando você tem horário?<div class="msg-time">11:08 ✓✓</div></div>
+              <div class="msg out">Esta semana tenho quinta às 14h ou sábado às 10h. Qual fica melhor pra você?<div class="msg-time">11:09 ✓✓</div></div>
+              <div class="msg in">Sábado às 10h perfeito! Quanto fica?<div class="msg-time">11:10 ✓✓</div></div>
+              <div class="msg out">Design completo CA$45. Te mando o endereço. Confirma sábado? 😊<div class="msg-time">11:11 ✓✓</div></div>
+              <div class="msg in">Confirmado! Muito obrigada ❤️<div class="msg-time">11:12 ✓✓</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- CONTEÚDO -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">O que está dentro</span>
+    <h2 class="sh">12 módulos de ação.<br><em>Do zero à agenda cheia.</em></h2>
+    <p class="sp" style="margin-top:14px">Não é um ebook para ler e guardar na pasta de downloads. É um sistema para executar em 30 dias com ações concretas — semana a semana.</p>
+
+    <div class="mod-grid">
+      <div class="mod-item"><div class="mod-n">01</div><div class="mod-content"><h4>Como montar um negócio que o cliente local quer contratar</h4><p>Não só um serviço — uma solução posicionada para o mercado onde você está</p></div></div>
+      <div class="mod-item"><div class="mod-n">02</div><div class="mod-content"><h4>A oferta que fecha</h4><p>Como comunicar o que você faz de um jeito que o cliente entende e quer — sem precisar convencer</p></div></div>
+      <div class="mod-item"><div class="mod-n">03</div><div class="mod-content"><h4>Posicionamento local — ser a primeira opção</h4><p>Como ser lembrado como referência na sua região antes mesmo de anunciar</p></div></div>
+      <div class="mod-item"><div class="mod-n">04</div><div class="mod-content"><h4>O perfil do Instagram que vende enquanto você trabalha</h4><p>Configuração completa para que o cliente chegue pronto para fechar</p></div></div>
+      <div class="mod-item"><div class="mod-n">05</div><div class="mod-content"><h4>Conteúdo que atrai — o que funciona de verdade</h4><p>Por que 80% do que você posta agora não funciona e o que mudar amanhã</p></div></div>
+      <div class="mod-item"><div class="mod-n">06</div><div class="mod-content"><h4>Autoridade do zero em 30 dias no exterior</h4><p>Como construir credibilidade local sem precisar de anos de experiência</p></div></div>
+      <div class="mod-item"><div class="mod-n">07</div><div class="mod-content"><h4>Anúncios de €5/dia que trazem cliente real</h4><p>Passo a passo do zero — sem experiência prévia com Meta Ads</p></div></div>
+      <div class="mod-item"><div class="mod-n">08</div><div class="mod-content"><h4>Sistema de geração de leads diária</h4><p>Como ter novos potenciais clientes chegando todo dia — mesmo quando você está no trabalho</p></div></div>
+      <div class="mod-item"><div class="mod-n">09</div><div class="mod-content"><h4>Os 10 scripts de fechamento pelo WhatsApp</h4><p>Palavra por palavra — do primeiro contato até o cliente confirmado e pago</p></div></div>
+      <div class="mod-item"><div class="mod-n">10</div><div class="mod-content"><h4>Como lotar a agenda e manter cheia todo mês</h4><p>O sistema de recorrência que faz o cliente voltar sem você precisar buscar</p></div></div>
+      <div class="mod-item"><div class="mod-n">11</div><div class="mod-content"><h4>Como aumentar preço sem perder cliente</h4><p>A sequência exata para cobrar mais e o cliente aceitar naturalmente</p></div></div>
+      <div class="mod-item"><div class="mod-n">12</div><div class="mod-content"><h4>Escalando: de autônomo para negócio previsível</h4><p>Como criar previsibilidade de renda e parar de depender de sorte</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- BÔNUS -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">Incluso hoje</span>
+    <h2 class="sh">5 ferramentas prontas.<br><em>Para usar amanhã.</em></h2>
+    <p class="sp" style="margin-top:14px">Materiais que transformam leitura em resultado imediato — sem precisar criar nada do zero.</p>
+
+    <div class="bn-grid">
+      <div class="bn-cell">
+        <div class="bn-i">01</div>
+        <div>
+          <div class="bn-h">Kit Scripts de WhatsApp</div>
+          <div class="bn-p">10 scripts prontos palavra por palavra — primeiro contato, qualificação, orçamento, fechamento, follow-up, reativação de lead frio, pedido de depoimento e indicação estratégica. Você copia, adapta e manda.</div>
+          <div class="bn-val">Valor individual: <strong>€97</strong></div>
+        </div>
+      </div>
+      <div class="bn-cell">
+        <div class="bn-i">02</div>
+        <div>
+          <div class="bn-h">Biblioteca de Anúncios Prontos</div>
+          <div class="bn-p">23 criativos testados para Meta Ads — imagens, textos e CTAs adaptados para público brasileiro no exterior, organizados por nicho de serviço. Só escolher, editar e publicar.</div>
+          <div class="bn-val">Valor individual: <strong>€147</strong></div>
+        </div>
+      </div>
+      <div class="bn-cell">
+        <div class="bn-i">03</div>
+        <div>
+          <div class="bn-h">50 Prompts de IA para Negócio no Exterior</div>
+          <div class="bn-p">Prompts prontos para criar legendas, anúncios, respostas para objeções e conteúdo de Instagram usando ChatGPT — em segundos, sem precisar saber escrever.</div>
+          <div class="bn-val">Valor individual: <strong>€47</strong></div>
+        </div>
+      </div>
+      <div class="bn-cell">
+        <div class="bn-i">04</div>
+        <div>
+          <div class="bn-h">Calendário de Conteúdo 30 Dias</div>
+          <div class="bn-p">O que publicar cada dia durante 30 dias — tema, formato e legenda sugerida — para quem não sabe o que postar. Você nunca mais fica olhando para tela em branco.</div>
+          <div class="bn-val">Valor individual: <strong>€37</strong></div>
+        </div>
+      </div>
+      <div class="bn-cell">
+        <div class="bn-i">05</div>
+        <div>
+          <div class="bn-h">Kit Perfil Magnético</div>
+          <div class="bn-p">Bio otimizada, configuração de destaques, foto de perfil e ajustes de conta que fazem o cliente confiar antes de mandar a primeira mensagem. Implementação em menos de 1 hora.</div>
+          <div class="bn-val">Valor individual: <strong>€67</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-total">
+      <div class="stack-left">
+        <strong>Valor total do pacote completo</strong>
+        Sistema LAE + 5 bônus exclusivos
+      </div>
+      <div class="stack-right">
+        <div class="old">€692 em valor</div>
+        <div class="new">€37</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ROI -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">O cálculo é simples</span>
+    <h2 class="sh">€37 investidos.<br><em>Quanto você recupera?</em></h2>
+    <p class="sp" style="margin-top:14px">Com um único cliente fechado, o sistema já se pagou. Veja a simulação com valores reais do mercado:</p>
+
+    <div class="roi-grid">
+      <div class="roi-card"><div class="roi-n">1 cliente</div><div class="roi-l" style="font-size:18px;font-weight:700;color:var(--t);margin:6px 0">€80–150</div><div class="roi-l">retorno mínimo</div></div>
+      <div class="roi-card"><div class="roi-n">3 clientes</div><div class="roi-l" style="font-size:18px;font-weight:700;color:var(--t);margin:6px 0">€240–450</div><div class="roi-l">em uma semana</div></div>
+      <div class="roi-card"><div class="roi-n">5 clientes</div><div class="roi-l" style="font-size:18px;font-weight:700;color:var(--t);margin:6px 0">€400–750</div><div class="roi-l">em duas semanas</div></div>
+      <div class="roi-card"><div class="roi-n">10 clientes</div><div class="roi-l" style="font-size:18px;font-weight:700;color:var(--t);margin:6px 0">€800–1.500</div><div class="roi-l">no primeiro mês</div></div>
+    </div>
+
+    <p class="sp" style="margin-top:24px;text-align:center">Investimento no sistema: <strong style="color:var(--g)">€37</strong>. Um único cliente já paga o guia <strong style="color:var(--t)">mais de 3 vezes.</strong></p>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- GARANTIA -->
+<section class="z">
+  <div class="w">
+    <div class="gtee">
+      <span class="gtee-badge">🛡️</span>
+      <div class="gtee-days">7</div>
+      <div class="gtee-sub">DIAS DE GARANTIA TOTAL</div>
+      <div class="gtee-title" style="margin-top:20px">Você não tem nada a perder.<br>Literalmente.</div>
+      <p class="gtee-text" style="margin-top:16px">Eu sei que você já foi prometido por produtos que não entregaram. Por isso não vou pedir que confie em mim antes de tentar.</p>
+      <p class="gtee-text" style="margin-top:14px">Aplique o Sistema LAE por 7 dias. Siga o passo a passo. Use pelo menos 3 scripts.</p>
+      <p class="gtee-text" style="margin-top:14px">Se até o sétimo dia você não tiver recebido nenhuma resposta de potencial cliente — me manda um email com "quero meu dinheiro de volta" e eu devolvo na hora. <strong style="color:var(--t)">Sem formulário, sem espera, sem explicação.</strong></p>
+      <p class="gtee-text" style="margin-top:14px">Você tem €37 protegidos. O risco é zero. O único custo é não tentar.</p>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- FAQ -->
+<section class="z">
+  <div class="w">
+    <span class="eyebrow">Perguntas frequentes</span>
+    <h2 class="sh">Tudo que você<br><em>precisa saber</em></h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Funciona no meu nicho de serviço?<span class="faq-ic">+</span></div>
+        <div class="faq-a">Foi testado e validado em limpeza, pintura, estética, construção, jardinagem, barbearia, delivery, mudanças e personal. Se você presta qualquer serviço local no exterior, o sistema funciona — porque os princípios de localização, abordagem e escala são os mesmos independente do nicho.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Já tentei Instagram antes e não veio nada. Por que seria diferente agora?<span class="faq-ic">+</span></div>
+        <div class="faq-a">Porque Instagram sozinho não funciona no exterior. O que você tentou antes era conteúdo sem estratégia — o algoritmo não entrega para quem mora no seu bairro. O Sistema LAE combina posicionamento + abordagem direta + scripts de WhatsApp. É estruturalmente diferente do que você tentou.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Não tenho tempo para estudar mais um curso.<span class="faq-ic">+</span></div>
+        <div class="faq-a">Não é curso. É um sistema de ação diária. Nos primeiros 7 dias você precisa de 30–45 minutos por dia para configurar. Depois de configurado, a captação roda com muito menos esforço. O objetivo é economizar seu tempo — não consumir mais dele.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Precisa saber anunciar no Meta Ads?<span class="faq-ic">+</span></div>
+        <div class="faq-a">Não para começar. O sistema tem estratégia orgânica completa que funciona sem gastar em anúncio. Quando você quiser escalar com tráfego pago, o módulo 7 ensina do absoluto zero — sem experiência prévia necessária.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Funciona no país onde eu moro?<span class="faq-ic">+</span></div>
+        <div class="faq-a">Foi aplicado com sucesso na Irlanda, Portugal, Inglaterra, EUA e Canadá. Os scripts e a estratégia foram desenvolvidos especificamente para o comportamento do cliente nesses mercados — onde o cliente decide diferente do que no Brasil.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Por que custa só €37 se vale €692?<span class="faq-ic">+</span></div>
+        <div class="faq-a">Porque o objetivo é que você aplique e tenha resultado — não que o preço seja a barreira de entrada. Com um único cliente fechado, o sistema já se paga mais de 3 vezes. Preço acessível é uma decisão estratégica, não reflexo de qualidade.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">E se eu comprar e não gostar?<span class="faq-ic">+</span></div>
+        <div class="faq-a">7 dias de garantia total. Se não gostar por qualquer motivo — ou se aplicar os scripts e não receber nenhuma resposta — manda um email e eu devolvo cada centavo. Sem pergunta, sem burocracia. Simples assim.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- CTA FINAL -->
+<section class="z" id="cta">
+  <div class="w">
+    <div class="cta-final">
+      <h2>Seu próximo cliente já está<br>procurando por alguém como você.<br><em>A questão é se vai te encontrar.</em></h2>
+      <p>Cada dia que passa sem o sistema é mais um dia dependendo de indicação, mais um mês de renda imprevisível, mais um cliente que vai para o concorrente. O Sistema LAE custa €37. Um único serviço fechado já paga esse investimento 3, 5, 10 vezes.</p>
+
+      <div class="price-old" style="font-size:14px">De €692 em valor total</div>
+      <div class="price-big" style="font-size:64px;margin:8px 0 4px"><sup>€</sup>37</div>
+      <div class="price-note" style="margin-bottom:32px">Pagamento único · Acesso vitalício · Em português</div>
+
+      <a href="#" class="btn btn-full btn-lg">Quero minha agenda cheia — €37 →</a>
+      <div class="h-secure" style="margin-top:18px;font-size:12px">🔒 Compra segura <span>·</span> Garantia de 7 dias <span>·</span> PDF entregue imediatamente por e-mail</div>
+
+      <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--b);display:flex;flex-wrap:wrap;justify-content:center;gap:24px">
+        <span class="h-ck"><span class="ic">✓</span> Sistema LAE completo</span>
+        <span class="h-ck"><span class="ic">✓</span> 10 Scripts de WhatsApp</span>
+        <span class="h-ck"><span class="ic">✓</span> Biblioteca de anúncios</span>
+        <span class="h-ck"><span class="ic">✓</span> 50 Prompts de IA</span>
+        <span class="h-ck"><span class="ic">✓</span> Calendário 30 dias</span>
+        <span class="h-ck"><span class="ic">✓</span> Kit perfil magnético</span>
+        <span class="h-ck"><span class="ic">✓</span> Garantia de 7 dias</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="z">
+  <p>Sistema LAE · Método Agenda Lotada no Exterior<br>
+  Irlanda · Portugal · Inglaterra · Estados Unidos · Canadá<br><br>
+  Os resultados apresentados são de usuários reais. Resultados individuais podem variar conforme dedicação e aplicação do sistema.</p>
+</footer>
+
+<script>
+// FAQ
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.parentElement;
+    const isOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!isOpen)item.classList.add('open');
+  });
+});
+
+// Timer regressivo 48h
+(function(){
+  const KEY='lae_timer';
+  let end=localStorage.getItem(KEY);
+  if(!end){end=Date.now()+48*3600*1000;localStorage.setItem(KEY,end);}
+  end=parseInt(end);
+  function tick(){
+    const now=Date.now();
+    const diff=Math.max(0,end-now);
+    const h=String(Math.floor(diff/3600000)).padStart(2,'0');
+    const m=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    const s=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    document.querySelectorAll('.timer-val').forEach(el=>el.textContent=h+':'+m+':'+s);
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// Vercel toolbar hide
+(function(){
+  function hide(){
+    const sel=['vercel-live-feedback','#__vercel_toolbar','[data-vercel-toolbar]'];
+    sel.forEach(s=>{const el=document.querySelector(s);if(el)el.style.display='none';});
+  }
+  hide();
+  const obs=new MutationObserver(hide);
+  obs.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+</body>
+</html>
